@@ -12,7 +12,9 @@ def get_log_path(model_type, backbone="vgg16", custom_postfix=""):
     outputs:
         log_path = tensorboard log path, for example: "logs/rpn_mobilenet_v2/{date}"
     """
-    return "logs/{}_{}{}/{}".format(model_type, backbone, custom_postfix, datetime.now().strftime("%Y%m%d-%H%M%S"))
+    if os.path.isdir('logs') is False:
+        os.mkdir('logs')
+    return "logs/{}_{}".format(model_type, backbone)
 
 def get_model_path(model_type, backbone="vgg16"):
     """Generating model path from model_type value for save/load model weights.

@@ -6,11 +6,8 @@ from utils import io_utils, data_utils, train_utils, bbox_utils
 from models import faster_rcnn
 from models.rpn_mobilenet_v2 import get_model as get_rpn_model
 
-args = io_utils.handle_args()
-if args.handle_gpu:
-    io_utils.handle_gpu_compatibility()
 
-batch_size = 4
+batch_size = 2
 epochs = 5
 load_weights = False
 backbone = 'mobilenet_v2'
@@ -59,8 +56,10 @@ log_path = io_utils.get_log_path("faster_rcnn", backbone)
 checkpoint_callback = ModelCheckpoint(frcnn_model_path, monitor="val_loss", save_best_only=True, save_weights_only=True)
 tensorboard_callback = TensorBoard(log_dir=log_path)
 
-step_size_train = train_utils.get_step_size(train_total_items, batch_size)
-step_size_val = train_utils.get_step_size(val_total_items, batch_size)
+# step_size_train = train_utils.get_step_size(train_total_items, batch_size)
+# step_size_val = train_utils.get_step_size(val_total_items, batch_size)
+step_size_train = 10
+step_size_val = 10
 frcnn_model.fit(frcnn_train_feed,
                 steps_per_epoch=step_size_train,
                 validation_data=frcnn_val_feed,

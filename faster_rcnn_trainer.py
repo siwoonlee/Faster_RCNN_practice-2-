@@ -1,36 +1,25 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from utils import io_utils, data_utils, train_utils, bbox_utils
 from models import faster_rcnn
+from models.rpn_mobilenet_v2 import get_model as get_rpn_model
 
 args = io_utils.handle_args()
 if args.handle_gpu:
     io_utils.handle_gpu_compatibility()
 
 batch_size = 4
-epochs = 50
+epochs = 5
 load_weights = False
-with_voc_2012 = True
-backbone = args.backbone
-io_utils.is_valid_backbone(backbone)
-
-if backbone == "mobilenet_v2":
-    from models.rpn_mobilenet_v2 import get_model as get_rpn_model
-else:
-    from models.rpn_vgg16 import get_model as get_rpn_model
-
+backbone = 'mobilenet_v2'
 hyper_params = train_utils.get_hyper_params(backbone)
 
-train_data, dataset_info = data_utils.get_dataset("voc/2007", "train+validation")
+train_data, dataset_info = data_utils.get_dataset("voc/2007", "train")
 val_data, _ = data_utils.get_dataset("voc/2007", "test")
-train_total_items = data_utils.get_total_item_size(dataset_info, "train+validation")
+train_total_items = data_utils.get_total_item_size(dataset_info, "train")
 val_total_items = data_utils.get_total_item_size(dataset_info, "test")
-
-if with_voc_2012:
-    voc_2012_data, voc_2012_info = data_utils.get_dataset("voc/2012", "train+validation")
-    voc_2012_total_items = data_utils.get_total_item_size(voc_2012_info, "train+validation")
-    train_total_items += voc_2012_total_items
-    train_data = train_data.concatenate(voc_2012_data)
 
 labels = data_utils.get_labels(dataset_info)
 # We add 1 class for background
